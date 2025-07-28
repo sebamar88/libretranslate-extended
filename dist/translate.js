@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectLanguage = exports.translate = void 0;
-const DEFAULT_API_URL = "https://libretranslate.com";
+const DEFAULT_API_URL = "https://lt.vern.cc/translate";
 // Método para traducir
 const translate = async ({ query, source, target, format, apiurl, apiKey, }) => {
     if (!apiurl && !apiKey) {
