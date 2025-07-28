@@ -1,69 +1,75 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectLanguage = exports.translate = void 0;
-const DEFAULT_API_URL = "https://lt.vern.cc";
-const OFFICIAL_API_URL = "https://libretranslate.com";
-const translate = async ({ query, source, target, format, apiurl, apiKey, }) => {
-    // Usa oficial si se pasa apiKey, sino fallback
-    apiurl = apiurl || (apiKey ? OFFICIAL_API_URL : DEFAULT_API_URL);
-    source = source || "auto";
-    try {
-        // Obtener idiomas disponibles
-        const res1 = await fetch(`${apiurl}/languages`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        });
-        const languages = await res1.json();
-        const availableLanguages = [
-            "auto",
-            ...languages.map((l) => l.code),
-        ];
-        if (!availableLanguages.includes(source)) {
-            throw new TypeError(`Source language "${source}" not supported.`);
-        }
-        if (!availableLanguages.includes(target)) {
-            throw new TypeError(`Target language "${target}" not supported.`);
-        }
-        // Hacer la traducción
-        const res2 = await fetch(`${apiurl}/translate`, {
-            method: "POST",
-            body: JSON.stringify({
-                q: query,
-                source,
-                target,
-                format: format || "text",
-                apiKey: apiKey || "",
-            }),
-            headers: { "Content-Type": "application/json" },
-        });
-        const result = await res2.json();
-        if (!result?.translatedText) {
-            throw new Error(`Translation failed: ${JSON.stringify(result) || "Unknown error"}`);
-        }
-        return result.translatedText;
+exports.getLanguagesWithFlags = exports.getLanguageFlag = exports.findLanguage = exports.getLanguages = exports.detectLanguage = exports.translate = void 0;
+const API_URL = "https://lt.vern.cc";
+// Traducción básica
+const translate = async ({ query, source = "auto", target, format = "text", }) => {
+    const res = await fetch(`${API_URL}/translate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: query, source, target, format }),
+    });
+    const result = await res.json();
+    if (!result?.translatedText) {
+        throw new Error(`Translation failed: ${JSON.stringify(result)}`);
     }
-    catch (err) {
-        // Si falla todo, no rompe: retorna null (modo manual)
-        console.warn(`Translation failed: ${err.message}. Switching to manual mode.`);
-        return null;
-    }
+    return result.translatedText;
 };
 exports.translate = translate;
 // Detección de idioma
-const detectLanguage = async (text, apiurl = DEFAULT_API_URL) => {
-    try {
-        const res = await fetch(apiurl.replace(/\/translate$/, "") + "/detect", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ q: text.trim() }),
-        });
-        const result = await res.json();
-        return result?.[0]?.language || "es";
-    }
-    catch (err) {
-        console.warn(`Language detection failed: ${err.message}`);
-        return "es";
-    }
+const detectLanguage = async (text) => {
+    const res = await fetch(`${API_URL}/detect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: text.trim() }),
+    });
+    const result = await res.json();
+    return result?.[0]?.language || "es";
 };
 exports.detectLanguage = detectLanguage;
+// Obtener idiomas soportados
+const getLanguages = async () => {
+    const res = await fetch(`${API_URL}/languages`);
+    const langs = await res.json();
+    return langs.map((l) => ({ code: l.code, name: l.name }));
+};
+exports.getLanguages = getLanguages;
+// Cache simple para evitar múltiples fetch
+let cachedLanguages = null;
+const ensureLanguages = async () => {
+    if (!cachedLanguages)
+        cachedLanguages = await (0, exports.getLanguages)();
+    return cachedLanguages;
+};
+// Obtener idioma por código o nombre
+const findLanguage = async (input) => {
+    const langs = await ensureLanguages();
+    const lower = input.toLowerCase();
+    return langs.find((l) => l.code.toLowerCase() === lower || l.name.toLowerCase() === lower);
+};
+exports.findLanguage = findLanguage;
+// Utilidades para flags
+const FLAGS = {
+    en: "🇬🇧",
+    es: "🇪🇸",
+    fr: "🇫🇷",
+    de: "🇩🇪",
+    it: "🇮🇹",
+    pt: "🇵🇹",
+    ru: "🇷🇺",
+    zh: "🇨🇳",
+    ja: "🇯🇵",
+    ko: "🇰🇷",
+};
+const getLanguageFlag = (code) => FLAGS[code] || "🏳️";
+exports.getLanguageFlag = getLanguageFlag;
+// Obtener lista de idiomas con flags
+const getLanguagesWithFlags = async () => {
+    const langs = await ensureLanguages();
+    return langs.map((l) => ({
+        ...l,
+        flag: (0, exports.getLanguageFlag)(l.code),
+    }));
+};
+exports.getLanguagesWithFlags = getLanguagesWithFlags;
 //# sourceMappingURL=translate.js.map
