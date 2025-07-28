@@ -1,0 +1,35 @@
+{
+    "name": "libretranslate-extended",
+    "version": "1.0.1",
+    "description": "Extended API wrapper for LibreTranslate with built-in language detection and improvements.",
+    "main": "dist/translate.js",
+    "types": "dist/translate.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sebamar88/libretranslate-extended.git"
+    },
+    "keywords": [
+        "translate",
+        "libretranslate",
+        "translation",
+        "api",
+        "language-detection",
+        "typescript",
+        "wrapper"
+    ],
+    "author": "Sebastián Martínez <sebamar88>",
+    "license": "AGPL-3.0-or-later",
+    "bugs": {
+        "url": "https://github.com/sebamar88/libretranslate-extended/issues"
+    },
+    "homepage": "https://github.com/sebamar88/libretranslate-extended#readme",
+    "dependencies": {
+        "@types/node": "^18.0.6",
+        "typescript": "^4.7.4"
+    }
+}
