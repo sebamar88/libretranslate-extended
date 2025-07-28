@@ -61,51 +61,10 @@ const lang = await detectLanguage("Bonjour tout le monde");
 console.log(lang); // "fr"
 ```
 
-Using `getLanguages()` and `getLanguagesWithFlags()` function.
-
-```js
-import { getLanguages, getLanguagesWithFlags } from "libretranslate-extended";
-
-const langs = await getLanguages();
-console.log(langs);
-/*
-[
-  { code: "en", name: "English" },
-  { code: "es", name: "Spanish" },
-  ...
-]
-*/
-
-const langsWithFlags = await getLanguagesWithFlags();
-console.log(langsWithFlags);
-/*
-[
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "es", name: "Spanish", flag: "🇪🇸" },
-  ...
-]
-*/
-```
-
-Using `findLanguage()` and `getLanguageFlag()` function.
-
-```js
-import { findLanguage, getLanguageFlag } from "libretranslate-extended";
-
-const lang = await findLanguage("es");
-console.log(lang); // { code: "es", name: "Spanish" }
-
-console.log(getLanguageFlag("es")); // "🇪🇸"
-```
-
 ### Available Methods
 
 -   `translate(options: TranslateOptions): Promise<string>` - Translates text.
 -   `detectLanguage(text: string): Promise<string>` - Detects the language of the given text.
--   `getLanguages(): Promise<Language[]>` - Retrieves a list of supported languages.
--   `getLanguagesWithFlags(): Promise<LanguageWithFlag[]>` - Retrieves a list of supported languages with flags.
--   `findLanguage(code: string): Promise<Language | null>` - Finds a language by its code.
--   `getLanguageFlag(code: string): string` - Gets the flag emoji for a given language code.
 
 ### About
 
