@@ -7,7 +7,7 @@ interface TranslateOptions {
     apiKey?: string;
 }
 
-const DEFAULT_API_URL = "https://lt.vern.cc/translate";
+const DEFAULT_API_URL = "https://lt.vern.cc";
 
 // Método para traducir
 export const translate = async ({
