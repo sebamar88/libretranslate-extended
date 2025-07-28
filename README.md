@@ -5,6 +5,10 @@
 Extended API wrapper for LibreTranslate, an open-source alternative to Google Translate.  
 Supports the official API as well as self-hosted instances, with **built-in language detection**.
 
+[![npm version](https://img.shields.io/npm/v/libretranslate-extended.svg)](https://www.npmjs.com/package/libretranslate-extended)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D17.5.0-brightgreen)](https://nodejs.org/)
+
 ## Installation
 
 **Node.js v17.5.0 or newer with fetch is required.**
