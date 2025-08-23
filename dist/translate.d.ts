@@ -1,10 +1,4 @@
-interface TranslateOptions {
-    query: string;
-    source?: string;
-    target: string;
-    format?: string;
-}
-export declare const translate: ({ query, source, target, format, }: TranslateOptions) => Promise<string>;
-export declare const detectLanguage: (text: string) => Promise<string>;
-export {};
+import { ClientConfig, TranslateOptions } from "./types";
+export declare function translate(opts: TranslateOptions | string): Promise<string>;
+export declare function detectLanguage(text: string, cfg?: ClientConfig): Promise<string>;
 //# sourceMappingURL=translate.d.ts.map

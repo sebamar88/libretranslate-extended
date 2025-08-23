@@ -1,65 +1,60 @@
-const API_URL = "https://lt.vern.cc";
+import { ftapiTranslate } from "./providers/ftapi";
+import { ClientConfig, TranslateOptions } from "./types";
+// import { libreTranslate } from "./providers/libretranslate"; // el tuyo actual
 
-interface TranslateOptions {
-    query: string;
-    source?: string; // Puede ser un código de idioma o "auto"
-    target: string;
-    format?: string; // text o html
-}
-
-interface LanguageDetection {
-    language: string;
-    confidence?: number;
-}
-
-// Traducción con error explícito si falla
-export const translate = async ({
-    query,
-    source = "auto",
-    target,
-    format = "text",
-}: TranslateOptions): Promise<string> => {
-    const res = await fetch(`${API_URL}/translate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ q: query, source, target, format }),
-    });
-
-    if (!res.ok) {
-        throw new Error(
-            `Translation API error: ${res.status} ${res.statusText}`
-        );
-    }
-
-    const result = await res.json();
-    if (!result?.translatedText) {
-        throw new Error(`Translation failed: ${JSON.stringify(result)}`);
-    }
-
-    return result.translatedText;
+const DEFAULTS = {
+    provider:
+        (process.env.LT_PROVIDER as "libretranslate" | "ftapi") ??
+        "libretranslate",
+    baseUrl: process.env.LT_BASE_URL, // opcional, respeta tu semántica actual
 };
 
-// Detección con validación estricta
-export const detectLanguage = async (text: string): Promise<string> => {
-    const res = await fetch(`${API_URL}/detect`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ q: text.trim() }),
+export async function translate(
+    opts: TranslateOptions | string
+): Promise<string> {
+    const options =
+        typeof opts === "string"
+            ? { query: opts, target: "en" } // o como lo manejes ahora
+            : opts;
+
+    const provider = options.provider ?? DEFAULTS.provider;
+
+    if (provider === "ftapi") {
+        const { text } = await ftapiTranslate({
+            query: options.query,
+            source: options.source,
+            target: options.target,
+            baseUrl: options.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
+        });
+        return text;
+    }
+
+    return translate({
+        query: options.query,
+        source: options.source,
+        target: options.target,
+        baseUrl: options.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
     });
+}
 
-    if (!res.ok) {
-        throw new Error(`Detection API error: ${res.status} ${res.statusText}`);
+export async function detectLanguage(
+    text: string,
+    cfg?: ClientConfig
+): Promise<string> {
+    const provider = cfg?.provider ?? DEFAULTS.provider;
+
+    if (provider === "ftapi") {
+        // FTAPI no expone /detect; hacemos un translate “barato”
+        // truco: traducir a un idioma neutral (ej. "en") y leer source-language
+        const { detectedSourceLang } = await ftapiTranslate({
+            query: text,
+            target: "en",
+            baseUrl: cfg?.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
+        });
+        if (!detectedSourceLang)
+            throw new Error("FTAPI: could not detect language");
+        return detectedSourceLang;
     }
 
-    const result: LanguageDetection[] = await res.json();
-    if (
-        !result ||
-        !Array.isArray(result) ||
-        result.length === 0 ||
-        !result[0].language
-    ) {
-        throw new Error(`Language detection failed: ${JSON.stringify(result)}`);
-    }
-
-    return result[0].language;
-};
+    return detectLanguage(text, cfg);
+}
