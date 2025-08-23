@@ -1,80 +1,49 @@
-// src/providers/ftapi.ts
-export type FTAPITranslateParams = {
-    query: string;
-    source?: string | null; // undefined/null => autodetect
-    target: string;
-    baseUrl?: string; // por si querés apuntar a un mirror
+// providers/ftapi.ts
+import fetch from "node-fetch";
+
+export type FtapiConfig = {
+    baseUrl?: string; // opcional, default público
 };
 
-type FTAPIResponse = {
-    ["source-language"]?: string;
-    ["source-text"]?: string;
-    ["destination-language"]?: string;
-    ["destination-text"]?: string;
-    pronunciation?: {
-        ["source-text-phonetic"]?: string | null;
-        ["source-text-audio"]?: string | null;
-        ["destination-text-audio"]?: string | null;
-    };
-    translations?: {
-        ["all-translations"]?: any;
-        ["possible-translations"]?: string[] | null;
-        ["possible-mistakes"]?: string[] | null;
-    };
-    definitions?: Array<{
-        ["part-of-speech"]?: string | null;
-        definition?: string | null;
-        example?: string | null;
-        ["other-examples"]?: string[] | null;
-        synonyms?: Record<string, string[]> | null;
-    }> | null;
-    ["see-also"]?: string[] | null;
+type TranslateParams = {
+    query: string | string[];
+    source?: string; // 'auto' | 'es' | ...
+    target: string; // 'en' | ...
+};
+
+export type FtapiResult = {
+    text: string | string[];
+    // FTAPI no documenta un campo estándar de idioma detectado
+    detectedSourceLang?: string; // lo dejamos opcional y normalmente undefined
 };
 
 const DEFAULT_BASE = "https://ftapi.pythonanywhere.com";
 
-export async function ftapiTranslate({
-    query,
-    source,
-    target,
-    baseUrl = DEFAULT_BASE,
-}: FTAPITranslateParams): Promise<{
-    text: string;
-    detectedSourceLang?: string;
-    raw: FTAPIResponse;
-}> {
-    if (!query?.trim()) throw new Error("Empty text");
-    if (!target) throw new Error("Missing target language");
+export async function ftapiTranslate(
+    { query, source, target }: TranslateParams,
+    cfg?: FtapiConfig
+): Promise<FtapiResult> {
+    // Doc pública: admite 'sl' (source), 'dl' (dest) y 'text'.
+    // Si no mandás 'sl', autodetecta. No hay JSON formal documentado; la API expone un texto plano o JSON simple. :contentReference[oaicite:5]{index=5}
 
-    const params = new URLSearchParams({ dl: target, text: query });
-    if (source) params.set("sl", source);
+    const base = cfg?.baseUrl ?? DEFAULT_BASE;
 
-    const res = await fetch(`${baseUrl}/translate?${params.toString()}`, {
-        method: "GET",
-    });
-    if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        throw new Error(`FTAPI error ${res.status}: ${body}`);
+    // La API pública documenta 2 formas vía querystring.
+    // Implementamos una llamada directa simple:
+    const params = new URLSearchParams();
+    if (typeof query !== "string") {
+        // FTAPI no documenta batch; concatenamos con separador seguro o hacé múltiples requests según tu necesidad.
+        params.set("text", query.join("\n"));
+    } else {
+        params.set("text", query);
     }
+    params.set("dl", target);
+    if (source && source !== "auto") params.set("sl", source);
 
-    const data: FTAPIResponse = await res.json();
-    const translated = data?.["destination-text"];
-    if (typeof translated !== "string") {
-        throw new Error("FTAPI: invalid response (missing destination-text)");
-    }
+    const res = await fetch(`${base}/?${params.toString()}`);
+    if (!res.ok)
+        throw new Error(`FTAPI HTTP ${res.status}: ${await res.text()}`);
 
-    return {
-        text: translated,
-        detectedSourceLang: source ? undefined : data?.["source-language"],
-        raw: data,
-    };
-}
-
-export async function ftapiListLanguages(
-    baseUrl = DEFAULT_BASE
-): Promise<string[]> {
-    const res = await fetch(`${baseUrl}/languages`, { method: "GET" });
-    if (!res.ok) throw new Error(`FTAPI languages error ${res.status}`);
-    const langs = await res.json();
-    return Array.isArray(langs) ? langs : Object.keys(langs ?? {});
+    const text = await res.text(); // Devuelve texto directo en la demo pública
+    return { text };
 }

@@ -1,15 +1,15 @@
+// types.ts
 export type Provider = "libretranslate" | "ftapi";
 
-export type TranslateOptions = {
-    query: string;
-    target: string;
-    source?: string | null;
-    // NUEVO:
+export type ClientConfig = {
     provider?: Provider;
-    baseUrl?: string; // respeta el existente si ya lo tenías para LibreTranslate
+    baseUrl?: string; // para apuntar a tu instancia LT o a un FTAPI propio
+    apiKey?: string; // solo LT cuando corresponde
 };
 
-export type ClientConfig = {
-    provider?: Provider; // default "libretranslate"
-    baseUrl?: string; // default según provider
+export type TranslateOptions = ClientConfig & {
+    query: string | string[];
+    source?: string; // "auto" | "es" | ...
+    target: string; // "en" | "pt" | ...
+    format?: "text" | "html"; // LibreTranslate
 };

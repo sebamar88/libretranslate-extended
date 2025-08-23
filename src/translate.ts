@@ -1,60 +1,45 @@
+// translate.ts
 import { ftapiTranslate } from "./providers/ftapi";
-import { ClientConfig, TranslateOptions } from "./types";
-// import { libreTranslate } from "./providers/libretranslate"; // el tuyo actual
+import { libreTranslateTranslate } from "./providers/libretranslate";
+import type { ClientConfig, TranslateOptions } from "./types";
 
 const DEFAULTS = {
     provider:
         (process.env.LT_PROVIDER as "libretranslate" | "ftapi") ??
         "libretranslate",
-    baseUrl: process.env.LT_BASE_URL, // opcional, respeta tu semántica actual
+    baseUrl: process.env.LT_BASE_URL,
+    apiKey: process.env.LT_API_KEY,
 };
 
 export async function translate(
     opts: TranslateOptions | string
-): Promise<string> {
+): Promise<string | string[]> {
     const options =
-        typeof opts === "string"
-            ? { query: opts, target: "en" } // o como lo manejes ahora
-            : opts;
-
+        typeof opts === "string" ? { query: opts, target: "en" } : opts;
     const provider = options.provider ?? DEFAULTS.provider;
+    const baseUrl = options.baseUrl ?? DEFAULTS.baseUrl;
 
     if (provider === "ftapi") {
-        const { text } = await ftapiTranslate({
-            query: options.query,
-            source: options.source,
-            target: options.target,
-            baseUrl: options.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
-        });
+        const { text } = await ftapiTranslate(
+            {
+                query: options.query,
+                source: options.source,
+                target: options.target,
+            },
+            { baseUrl }
+        );
         return text;
     }
 
-    return translate({
-        query: options.query,
-        source: options.source,
-        target: options.target,
-        baseUrl: options.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
-    });
-}
-
-export async function detectLanguage(
-    text: string,
-    cfg?: ClientConfig
-): Promise<string> {
-    const provider = cfg?.provider ?? DEFAULTS.provider;
-
-    if (provider === "ftapi") {
-        // FTAPI no expone /detect; hacemos un translate “barato”
-        // truco: traducir a un idioma neutral (ej. "en") y leer source-language
-        const { detectedSourceLang } = await ftapiTranslate({
-            query: text,
-            target: "en",
-            baseUrl: cfg?.baseUrl ?? DEFAULTS.baseUrl ?? undefined,
-        });
-        if (!detectedSourceLang)
-            throw new Error("FTAPI: could not detect language");
-        return detectedSourceLang;
-    }
-
-    return detectLanguage(text, cfg);
+    // provider === "libretranslate"
+    const { text } = await libreTranslateTranslate(
+        {
+            query: options.query,
+            source: options.source ?? "auto", // LibreTranslate soporta 'auto'
+            target: options.target,
+            format: options.format ?? "text",
+        },
+        { baseUrl: baseUrl ?? "http://localhost:5000", apiKey: DEFAULTS.apiKey }
+    );
+    return text;
 }
