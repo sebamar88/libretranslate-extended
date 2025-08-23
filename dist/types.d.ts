@@ -1,13 +1,13 @@
 export type Provider = "libretranslate" | "ftapi";
-export type TranslateOptions = {
-    query: string;
-    target: string;
-    source?: string | null;
-    provider?: Provider;
-    baseUrl?: string;
-};
 export type ClientConfig = {
     provider?: Provider;
     baseUrl?: string;
+    apiKey?: string;
+};
+export type TranslateOptions = ClientConfig & {
+    query: string | string[];
+    source?: string;
+    target: string;
+    format?: "text" | "html";
 };
 //# sourceMappingURL=types.d.ts.map
