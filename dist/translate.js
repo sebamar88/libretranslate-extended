@@ -12,22 +12,23 @@ const DEFAULTS = {
 async function translate(opts) {
     const options = typeof opts === "string" ? { query: opts, target: "en" } : opts;
     const provider = options.provider ?? DEFAULTS.provider;
-    const baseUrl = options.baseUrl ?? DEFAULTS.baseUrl;
     if (provider === "ftapi") {
         const { text } = await (0, ftapi_1.ftapiTranslate)({
             query: options.query,
             source: options.source,
             target: options.target,
-        }, { baseUrl });
+        }, { baseUrl: options.baseUrl ?? DEFAULTS.baseUrl });
         return text;
     }
-    // provider === "libretranslate"
     const { text } = await (0, libretranslate_1.libreTranslateTranslate)({
         query: options.query,
         source: options.source ?? "auto",
         target: options.target,
         format: options.format ?? "text",
-    }, { baseUrl: baseUrl ?? "http://localhost:5000", apiKey: DEFAULTS.apiKey });
+    }, {
+        baseUrl: options.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000",
+        apiKey: DEFAULTS.apiKey,
+    });
     return text;
 }
 exports.translate = translate;
