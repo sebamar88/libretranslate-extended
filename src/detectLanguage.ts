@@ -7,10 +7,8 @@ import { ftapiTranslate } from "./providers/ftapi";
 import type { ClientConfig } from "./types";
 
 const DEFAULTS = {
-    provider:
-        (process.env.LT_PROVIDER as "libretranslate" | "ftapi") ??
-        "libretranslate",
-    baseUrl: process.env.LT_BASE_URL,
+    provider: "ftapi",
+    baseUrl: "https://ftapi.pythonanywhere.com",
     apiKey: process.env.LT_API_KEY,
 };
 
