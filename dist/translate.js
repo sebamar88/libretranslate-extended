@@ -5,9 +5,8 @@ exports.translate = void 0;
 const ftapi_1 = require("./providers/ftapi");
 const libretranslate_1 = require("./providers/libretranslate");
 const DEFAULTS = {
-    provider: process.env.LT_PROVIDER ??
-        "libretranslate",
-    baseUrl: process.env.LT_BASE_URL,
+    provider: "ftapi",
+    baseUrl: "https://ftapi.pythonanywhere.com",
     apiKey: process.env.LT_API_KEY,
 };
 async function translate(opts) {
