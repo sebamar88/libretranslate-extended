@@ -15,7 +15,6 @@ export async function translate(
     const options =
         typeof opts === "string" ? { query: opts, target: "en" } : opts;
     const provider = options.provider ?? DEFAULTS.provider;
-    const baseUrl = options.baseUrl ?? DEFAULTS.baseUrl;
 
     if (provider === "ftapi") {
         const { text } = await ftapiTranslate(
@@ -24,20 +23,23 @@ export async function translate(
                 source: options.source,
                 target: options.target,
             },
-            { baseUrl }
+            { baseUrl: options.baseUrl ?? DEFAULTS.baseUrl }
         );
         return text;
     }
 
-    // provider === "libretranslate"
     const { text } = await libreTranslateTranslate(
         {
             query: options.query,
-            source: options.source ?? "auto", // LibreTranslate soporta 'auto'
+            source: options.source ?? "auto",
             target: options.target,
             format: options.format ?? "text",
         },
-        { baseUrl: baseUrl ?? "http://localhost:5000", apiKey: DEFAULTS.apiKey }
+        {
+            baseUrl:
+                options.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000",
+            apiKey: DEFAULTS.apiKey,
+        }
     );
     return text;
 }
