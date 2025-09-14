@@ -1,4 +1,5 @@
 // detectLanguage.ts
+import { deeplTranslate } from "./providers/deepl";
 import { ftapiTranslate } from "./providers/ftapi";
 import {
     libreTranslateDetect,
@@ -27,6 +28,15 @@ export async function detectLanguage(
         if (!detectedSourceLang)
             throw new Error("FTAPI: could not detect language");
         return detectedSourceLang;
+    }
+
+    if (provider === "deepl") {
+        const { detectedSourceLang } = await deeplTranslate(
+            { query: text, target: "EN" },
+            { apiKey: cfg?.apiKey ?? process.env.DEEPL_API_KEY! }
+        );
+        if (!detectedSourceLang) throw new Error("DeepL: detection failed");
+        return detectedSourceLang.toLowerCase();
     }
 
     // LibreTranslate: primero /detect; si falla, fallback a /translate con source:"auto"

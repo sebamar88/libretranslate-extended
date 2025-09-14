@@ -1,7 +1,8 @@
 // translate.ts
 import { ftapiTranslate } from "./providers/ftapi";
 import { libreTranslateTranslate } from "./providers/libretranslate";
-import type { ClientConfig, TranslateOptions } from "./types";
+import { deeplTranslate } from "./providers/deepl";
+import type { TranslateOptions } from "./types";
 
 const DEFAULTS = {
     provider: "ftapi",
@@ -24,6 +25,18 @@ export async function translate(
                 target: options.target,
             },
             { baseUrl: options.baseUrl ?? DEFAULTS.baseUrl }
+        );
+        return text;
+    }
+
+    if (provider === "deepl") {
+        const { text } = await deeplTranslate(
+            {
+                query: options.query,
+                source: options.source,
+                target: options.target,
+            },
+            { apiKey: options.apiKey ?? process.env.DEEPL_API_KEY! }
         );
         return text;
     }
