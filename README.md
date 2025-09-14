@@ -35,13 +35,17 @@ yarn add libretranslate-extended
 import { translate } from "libretranslate-extended";
 
 async function main() {
-    const result = await translate({
-        provider: "deepl", // "deepl" | "libretranslate" | "ftapi"
-        query: "Hello, how are you?",
-        target: "es", // target language
-        source: "en", // optional, defaults to "auto" if supported
-        apiKey: process.env.DEEPL_API_KEY, // required for DeepL
-    });
+    const result = await translate(
+        {
+            query: "Hello, how are you?",
+            source: "en", // optional, defaults to "auto" if supported
+            target: "es", // target language
+        },
+        {
+            provider: "deepl", // "deepl" | "libretranslate" | "ftapi"
+            apiKey: process.env.DEEPL_API_KEY, // required for DeepL
+        }
+    );
 
     console.log(result);
     // → "Hola, ¿cómo estás?"
@@ -88,25 +92,6 @@ Each provider has different options:
 ### 🔹 FTAPI
 
 -   `baseUrl`: optional (default: `https://ftapi.pythonanywhere.com`)
-
----
-
-## 📝 Example with multiple providers
-
-```ts
-const providers = ["deepl", "libretranslate", "ftapi"];
-
-for (const provider of providers) {
-    const text = await translate({
-        provider,
-        query: "Good morning!",
-        target: "es",
-        apiKey: process.env.DEEPL_API_KEY, // only needed for deepl
-    });
-
-    console.log(`[${provider}] → ${text}`);
-}
-```
 
 ---
 
