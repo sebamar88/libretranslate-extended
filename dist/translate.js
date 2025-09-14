@@ -5,6 +5,7 @@ exports.translate = void 0;
 const ftapi_1 = require("./providers/ftapi");
 const libretranslate_1 = require("./providers/libretranslate");
 const deepl_1 = require("./providers/deepl");
+require("dotenv/config");
 const DEFAULTS = {
     provider: "deepl",
     apiKey: process.env.DEEPL_API_KEY,

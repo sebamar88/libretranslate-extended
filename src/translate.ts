@@ -3,6 +3,7 @@ import { ftapiTranslate } from "./providers/ftapi";
 import { libreTranslateTranslate } from "./providers/libretranslate";
 import { deeplTranslate } from "./providers/deepl";
 import type { TranslateOptions } from "./types";
+import "dotenv/config";
 
 const DEFAULTS = {
     provider: "deepl" as const,
