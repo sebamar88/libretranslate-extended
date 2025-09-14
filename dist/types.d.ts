@@ -1,4 +1,4 @@
-export type Provider = "libretranslate" | "ftapi";
+export type Provider = "libretranslate" | "ftapi" | "deepl";
 export type ClientConfig = {
     provider?: Provider;
     baseUrl?: string;

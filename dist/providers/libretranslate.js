@@ -1,11 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.libreTranslateDetect = exports.libreTranslateTranslate = void 0;
-const tslib_1 = require("tslib");
 // providers/libretranslate.ts
-const node_fetch_1 = tslib_1.__importDefault(require("node-fetch"));
-async function libreTranslateTranslate({ query, source = "auto", target, format = "text" }, cfg) {
-    const res = await (0, node_fetch_1.default)(`${cfg.baseUrl}/translate`, {
+import fetch from "node-fetch";
+export async function libreTranslateTranslate({ query, source = "auto", target, format = "text" }, cfg) {
+    const res = await fetch(`${cfg.baseUrl}/translate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -29,9 +25,8 @@ async function libreTranslateTranslate({ query, source = "auto", target, format 
         alternatives: data.alternatives,
     };
 }
-exports.libreTranslateTranslate = libreTranslateTranslate;
-async function libreTranslateDetect(text, cfg) {
-    const res = await (0, node_fetch_1.default)(`${cfg.baseUrl}/detect`, {
+export async function libreTranslateDetect(text, cfg) {
+    const res = await fetch(`${cfg.baseUrl}/detect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ q: text, api_key: cfg.apiKey }),
@@ -45,5 +40,4 @@ async function libreTranslateDetect(text, cfg) {
         throw new Error("Empty detection result");
     return list[0];
 }
-exports.libreTranslateDetect = libreTranslateDetect;
 //# sourceMappingURL=libretranslate.js.map
