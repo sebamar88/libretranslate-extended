@@ -1,78 +1,152 @@
-# LibreTranslate Extended (NPM)
-
-[Original API](https://libretranslate.com/)
-
-Extended API wrapper for LibreTranslate, an open-source alternative to Google Translate.  
-Supports the official API as well as self-hosted instances, with **built-in language detection**.
+# libretranslate-extended
 
 [![npm version](https://img.shields.io/npm/v/libretranslate-extended.svg)](https://www.npmjs.com/package/libretranslate-extended)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D17.5.0-brightgreen)](https://nodejs.org/)
+[![license](https://img.shields.io/npm/l/libretranslate-extended.svg)](./LICENCE)
 
-## Installation
+> Extended API wrapper for **LibreTranslate**, **DeepL** and **FTAPI**, with built-in language detection, TypeScript support and a unified interface.
 
-**Node.js v17.5.0 or newer with fetch is required.**
+---
+
+## ✨ Features
+
+-   🌍 Multi-provider support: **LibreTranslate**, **DeepL**, **FTAPI**
+-   🔎 Built-in language detection
+-   🧩 Unified API: mismo `translate()` sin importar el proveedor
+-   ⚡ Written in TypeScript (tipos incluidos)
+-   🛡️ Mejor manejo de errores
+
+---
+
+## 📦 Installation
 
 ```bash
-
-# NPM
-
 npm install libretranslate-extended
-
-
-# Yarn
-
+# o
 yarn add libretranslate-extended
-
 ```
 
-## Usage
+---
 
-```js
-// CommonJS
+## 🚀 Usage
 
-const { translate, detectLanguage } = require("libretranslate-extended");
+### Translate text
 
-// ES Modules (ESM) or Typescript
-
-import { translate, detectLanguage } from "libretranslate-extended";
-```
-
-Using `translate()` function.
-
-```js
+```ts
 import { translate } from "libretranslate-extended";
 
-const text = await translate({
-    query: "Hello world",
-    source: "en", // Optional (default: auto-detect)
-    target: "es",
-});
+async function main() {
+    const result = await translate({
+        provider: "deepl", // "deepl" | "libretranslate" | "ftapi"
+        query: "Hello, how are you?",
+        target: "es", // target language
+        source: "en", // optional, defaults to "auto" if supported
+        apiKey: process.env.DEEPL_API_KEY, // required for DeepL
+    });
 
-console.log(text); // "Hola mundo"
+    console.log(result);
+    // → "Hola, ¿cómo estás?"
+}
+
+main();
 ```
 
-Using `detectLanguage()` function.
+### Detect language
 
-```js
+```ts
 import { detectLanguage } from "libretranslate-extended";
 
-const lang = await detectLanguage("Bonjour tout le monde");
-console.log(lang); // "fr"
+async function main() {
+    const lang = await detectLanguage("Bonjour tout le monde", {
+        provider: "deepl", // or "libretranslate", "ftapi"
+        apiKey: process.env.DEEPL_API_KEY,
+    });
+
+    console.log(lang);
+    // → "fr"
+}
+
+main();
 ```
 
-### Available Methods
+---
 
--   `translate(options: TranslateOptions): Promise<string>` - Translates text.
--   `detectLanguage(text: string): Promise<string>` - Detects the language of the given text.
+## ⚙️ Configuration
 
-### About
+Each provider has different options:
 
-This package is based on the [`libretranslate`](https://www.npmjs.com/package/libretranslate) package,  
-retrieved and extended from its last available version on npm.
+### 🔹 DeepL
 
-The original project is no longer publicly maintained or hosted.  
-This fork continues its development and is licensed under **AGPL-3.0-or-later**.
+-   `apiKey`: **required** (get one at [DeepL API](https://www.deepl.com/pro-api))
+-   `source`: ISO-639-1 code (`"en"`, `"es"`, `"fr"`, etc.) or `"auto"`
+-   `target`: required language code
 
-Modified and maintained by **Sebastián Martínez (sebamar88)**, 2025.  
-See [LICENSE](./LICENSE) for details.
+### 🔹 LibreTranslate
+
+-   `baseUrl`: URL of your LibreTranslate instance (default: `http://localhost:5000`)
+-   `apiKey`: optional (depends on your server)
+
+### 🔹 FTAPI
+
+-   `baseUrl`: optional (default: `https://ftapi.pythonanywhere.com`)
+
+---
+
+## 📝 Example with multiple providers
+
+```ts
+const providers = ["deepl", "libretranslate", "ftapi"];
+
+for (const provider of providers) {
+    const text = await translate({
+        provider,
+        query: "Good morning!",
+        target: "es",
+        apiKey: process.env.DEEPL_API_KEY, // only needed for deepl
+    });
+
+    console.log(`[${provider}] → ${text}`);
+}
+```
+
+---
+
+## 📚 API
+
+### `translate(options: TranslateOptions | string): Promise<string | string[]>`
+
+-   `query`: text or array of texts to translate
+-   `target`: target language code
+-   `source`: optional source language code (`"auto"` supported)
+-   `provider`: `"deepl" | "libretranslate" | "ftapi"`
+-   `apiKey`: required for DeepL, optional for LibreTranslate
+
+### `detectLanguage(text: string, cfg?: ClientConfig): Promise<string>`
+
+-   `text`: input text
+-   `cfg.provider`: provider to use
+-   `cfg.apiKey`: required for DeepL
+
+---
+
+## 🛠 Development
+
+Clone the repo and install dependencies:
+
+```bash
+git clone https://github.com/sebamar88/libretranslate-extended.git
+cd libretranslate-extended
+npm install
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+---
+
+## 📄 License
+
+Licensed under [AGPL-3.0-or-later](./LICENCE).
+© 2025 Sebastián Martínez
