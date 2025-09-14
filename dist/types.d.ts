@@ -10,4 +10,3 @@ export type TranslateOptions = ClientConfig & {
     target: string;
     format?: "text" | "html";
 };
-//# sourceMappingURL=types.d.ts.map

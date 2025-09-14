@@ -11,4 +11,3 @@ export declare function deeplTranslate({ query, source, target }: TranslateParam
     detectedSourceLang?: string;
 }>;
 export {};
-//# sourceMappingURL=deepl.d.ts.map

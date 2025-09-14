@@ -1,23 +1,26 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.detectLanguage = void 0;
 // detectLanguage.ts
-import { deeplTranslate } from "./providers/deepl";
-import { ftapiTranslate } from "./providers/ftapi";
-import { libreTranslateDetect, libreTranslateTranslate, } from "./providers/libretranslate";
+const deepl_1 = require("./providers/deepl");
+const ftapi_1 = require("./providers/ftapi");
+const libretranslate_1 = require("./providers/libretranslate");
 const DEFAULTS = {
     provider: "ftapi",
     baseUrl: "https://ftapi.pythonanywhere.com",
     apiKey: process.env.LT_API_KEY,
 };
-export async function detectLanguage(text, cfg) {
+async function detectLanguage(text, cfg) {
     const provider = cfg?.provider ?? DEFAULTS.provider;
     if (provider === "ftapi") {
         // Truco FTAPI: /translate sin 'sl' => autodetecta; leemos "source-language"
-        const { detectedSourceLang } = await ftapiTranslate({ query: text, target: "en" }, { baseUrl: cfg?.baseUrl ?? DEFAULTS.baseUrl });
+        const { detectedSourceLang } = await (0, ftapi_1.ftapiTranslate)({ query: text, target: "en" }, { baseUrl: cfg?.baseUrl ?? DEFAULTS.baseUrl });
         if (!detectedSourceLang)
             throw new Error("FTAPI: could not detect language");
         return detectedSourceLang;
     }
     if (provider === "deepl") {
-        const { detectedSourceLang } = await deeplTranslate({ query: text, target: "EN" }, { apiKey: cfg?.apiKey ?? process.env.DEEPL_API_KEY });
+        const { detectedSourceLang } = await (0, deepl_1.deeplTranslate)({ query: text, target: "EN" }, { apiKey: cfg?.apiKey ?? process.env.DEEPL_API_KEY });
         if (!detectedSourceLang)
             throw new Error("DeepL: detection failed");
         return detectedSourceLang.toLowerCase();
@@ -25,14 +28,14 @@ export async function detectLanguage(text, cfg) {
     // LibreTranslate: primero /detect; si falla, fallback a /translate con source:"auto"
     const baseUrl = cfg?.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000";
     try {
-        const det = await libreTranslateDetect(text, {
+        const det = await (0, libretranslate_1.libreTranslateDetect)(text, {
             baseUrl,
             apiKey: cfg?.apiKey ?? DEFAULTS.apiKey,
         });
         return det.language;
     }
     catch {
-        const t = await libreTranslateTranslate({ query: text, source: "auto", target: "en" }, { baseUrl, apiKey: cfg?.apiKey ?? DEFAULTS.apiKey });
+        const t = await (0, libretranslate_1.libreTranslateTranslate)({ query: text, source: "auto", target: "en" }, { baseUrl, apiKey: cfg?.apiKey ?? DEFAULTS.apiKey });
         const lang = Array.isArray(t.detectedLanguage)
             ? t.detectedLanguage[0]?.language
             : t.detectedLanguage?.language;
@@ -41,4 +44,4 @@ export async function detectLanguage(text, cfg) {
         return lang;
     }
 }
-//# sourceMappingURL=detectLanguage.js.map
+exports.detectLanguage = detectLanguage;

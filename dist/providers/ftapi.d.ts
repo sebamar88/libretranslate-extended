@@ -12,4 +12,3 @@ export type FtapiResult = {
 };
 export declare function ftapiTranslate({ query, source, target }: TranslateParams, cfg?: FtapiConfig): Promise<FtapiResult>;
 export {};
-//# sourceMappingURL=ftapi.d.ts.map

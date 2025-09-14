@@ -1,17 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.translate = void 0;
 // translate.ts
-import { ftapiTranslate } from "./providers/ftapi";
-import { libreTranslateTranslate } from "./providers/libretranslate";
-import { deeplTranslate } from "./providers/deepl";
+const ftapi_1 = require("./providers/ftapi");
+const libretranslate_1 = require("./providers/libretranslate");
+const deepl_1 = require("./providers/deepl");
 const DEFAULTS = {
     provider: "deepl",
     apiKey: process.env.DEEPL_API_KEY,
     baseUrl: "",
 };
-export async function translate(opts) {
+async function translate(opts) {
     const options = typeof opts === "string" ? { query: opts, target: "en" } : opts;
     const provider = options.provider ?? DEFAULTS.provider;
     if (provider === "ftapi") {
-        const { text } = await ftapiTranslate({
+        const { text } = await (0, ftapi_1.ftapiTranslate)({
             query: options.query,
             source: options.source,
             target: options.target,
@@ -19,14 +22,14 @@ export async function translate(opts) {
         return text;
     }
     if (provider === "deepl") {
-        const { text } = await deeplTranslate({
+        const { text } = await (0, deepl_1.deeplTranslate)({
             query: options.query,
             source: options.source,
             target: options.target,
         }, { apiKey: options.apiKey ?? process.env.DEEPL_API_KEY });
         return text;
     }
-    const { text } = await libreTranslateTranslate({
+    const { text } = await (0, libretranslate_1.libreTranslateTranslate)({
         query: options.query,
         source: options.source ?? "auto",
         target: options.target,
@@ -37,4 +40,4 @@ export async function translate(opts) {
     });
     return text;
 }
-//# sourceMappingURL=translate.js.map
+exports.translate = translate;

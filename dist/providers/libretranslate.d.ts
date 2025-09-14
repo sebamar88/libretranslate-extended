@@ -25,4 +25,3 @@ export declare function libreTranslateDetect(text: string, cfg: LibreTranslateCo
     confidence?: number;
 }>;
 export {};
-//# sourceMappingURL=libretranslate.d.ts.map
