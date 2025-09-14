@@ -2,16 +2,17 @@
 import { ftapiTranslate } from "./providers/ftapi";
 import { libreTranslateTranslate } from "./providers/libretranslate";
 import { deeplTranslate } from "./providers/deepl";
-import type { TranslateOptions } from "./types";
+import type { ClientConfig, TranslateOptions } from "./types";
 import "dotenv/config";
 import { DEFAULTS } from "./contants";
 
 export async function translate(
-    opts: TranslateOptions | string
+    opts: TranslateOptions | string,
+    conf: ClientConfig
 ): Promise<string | string[]> {
     const options =
         typeof opts === "string" ? { query: opts, target: "en" } : opts;
-    const provider = options.provider ?? DEFAULTS.provider;
+    const provider = conf.provider ?? DEFAULTS.provider;
 
     if (provider === "ftapi") {
         const { text } = await ftapiTranslate(
@@ -20,7 +21,7 @@ export async function translate(
                 source: options.source,
                 target: options.target,
             },
-            { baseUrl: options.baseUrl ?? DEFAULTS.baseUrl }
+            { baseUrl: conf.baseUrl ?? DEFAULTS.baseUrl }
         );
         return text;
     }
@@ -32,7 +33,7 @@ export async function translate(
                 source: options.source,
                 target: options.target,
             },
-            { apiKey: options.apiKey ?? process.env.DEEPL_API_KEY! }
+            { apiKey: conf.apiKey ?? process.env.DEEPL_API_KEY! }
         );
         return text;
     }
@@ -46,8 +47,8 @@ export async function translate(
         },
         {
             baseUrl:
-                options.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000",
-            apiKey: DEFAULTS.apiKey,
+                conf.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000",
+            apiKey: conf.apiKey ?? DEFAULTS.apiKey,
         }
     );
     return text;

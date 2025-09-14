@@ -7,15 +7,15 @@ const libretranslate_1 = require("./providers/libretranslate");
 const deepl_1 = require("./providers/deepl");
 require("dotenv/config");
 const contants_1 = require("./contants");
-async function translate(opts) {
+async function translate(opts, conf) {
     const options = typeof opts === "string" ? { query: opts, target: "en" } : opts;
-    const provider = options.provider ?? contants_1.DEFAULTS.provider;
+    const provider = conf.provider ?? contants_1.DEFAULTS.provider;
     if (provider === "ftapi") {
         const { text } = await (0, ftapi_1.ftapiTranslate)({
             query: options.query,
             source: options.source,
             target: options.target,
-        }, { baseUrl: options.baseUrl ?? contants_1.DEFAULTS.baseUrl });
+        }, { baseUrl: conf.baseUrl ?? contants_1.DEFAULTS.baseUrl });
         return text;
     }
     if (provider === "deepl") {
@@ -23,7 +23,7 @@ async function translate(opts) {
             query: options.query,
             source: options.source,
             target: options.target,
-        }, { apiKey: options.apiKey ?? process.env.DEEPL_API_KEY });
+        }, { apiKey: conf.apiKey ?? process.env.DEEPL_API_KEY });
         return text;
     }
     const { text } = await (0, libretranslate_1.libreTranslateTranslate)({
@@ -32,8 +32,8 @@ async function translate(opts) {
         target: options.target,
         format: options.format ?? "text",
     }, {
-        baseUrl: options.baseUrl ?? contants_1.DEFAULTS.baseUrl ?? "http://localhost:5000",
-        apiKey: contants_1.DEFAULTS.apiKey,
+        baseUrl: conf.baseUrl ?? contants_1.DEFAULTS.baseUrl ?? "http://localhost:5000",
+        apiKey: conf.apiKey ?? contants_1.DEFAULTS.apiKey,
     });
     return text;
 }
