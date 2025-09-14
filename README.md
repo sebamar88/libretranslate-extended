@@ -97,7 +97,7 @@ Each provider has different options:
 
 ## 📚 API
 
-### `translate(options: TranslateOptions | string): Promise<string | string[]>`
+### `translate(options: TranslateOptions | string, cfg?: ClientConfig): Promise<string | string[]>`
 
 -   `query`: text or array of texts to translate
 -   `target`: target language code
