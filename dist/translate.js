@@ -3,9 +3,9 @@ import { ftapiTranslate } from "./providers/ftapi";
 import { libreTranslateTranslate } from "./providers/libretranslate";
 import { deeplTranslate } from "./providers/deepl";
 const DEFAULTS = {
-    provider: "ftapi",
-    baseUrl: "https://ftapi.pythonanywhere.com",
-    apiKey: process.env.LT_API_KEY,
+    provider: "deepl",
+    apiKey: process.env.DEEPL_API_KEY,
+    baseUrl: "",
 };
 export async function translate(opts) {
     const options = typeof opts === "string" ? { query: opts, target: "en" } : opts;

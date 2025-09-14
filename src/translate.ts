@@ -5,9 +5,9 @@ import { deeplTranslate } from "./providers/deepl";
 import type { TranslateOptions } from "./types";
 
 const DEFAULTS = {
-    provider: "ftapi",
-    baseUrl: "https://ftapi.pythonanywhere.com",
-    apiKey: process.env.LT_API_KEY,
+    provider: "deepl" as const,
+    apiKey: process.env.DEEPL_API_KEY,
+    baseUrl: "",
 };
 
 export async function translate(
