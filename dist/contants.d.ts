@@ -1,6 +1,6 @@
 import "dotenv/config";
 export declare const DEFAULTS: {
-    provider: "deepl";
+    provider: string;
     apiKey: string | undefined;
     baseUrl: string;
 };
