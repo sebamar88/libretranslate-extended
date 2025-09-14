@@ -7,6 +7,7 @@ import {
     libreTranslateTranslate,
 } from "./providers/libretranslate";
 import type { ClientConfig } from "./types";
+import "dotenv/config";
 
 export async function detectLanguage(
     text: string,

@@ -6,6 +6,7 @@ const contants_1 = require("./contants");
 const deepl_1 = require("./providers/deepl");
 const ftapi_1 = require("./providers/ftapi");
 const libretranslate_1 = require("./providers/libretranslate");
+require("dotenv/config");
 async function detectLanguage(text, cfg) {
     const provider = cfg?.provider ?? contants_1.DEFAULTS.provider;
     if (provider === "ftapi") {
