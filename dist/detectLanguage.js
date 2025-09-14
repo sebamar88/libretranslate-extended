@@ -2,19 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectLanguage = void 0;
 // detectLanguage.ts
+const contants_1 = require("./contants");
 const deepl_1 = require("./providers/deepl");
 const ftapi_1 = require("./providers/ftapi");
 const libretranslate_1 = require("./providers/libretranslate");
-const DEFAULTS = {
-    provider: "ftapi",
-    baseUrl: "https://ftapi.pythonanywhere.com",
-    apiKey: process.env.LT_API_KEY,
-};
 async function detectLanguage(text, cfg) {
-    const provider = cfg?.provider ?? DEFAULTS.provider;
+    const provider = cfg?.provider ?? contants_1.DEFAULTS.provider;
     if (provider === "ftapi") {
         // Truco FTAPI: /translate sin 'sl' => autodetecta; leemos "source-language"
-        const { detectedSourceLang } = await (0, ftapi_1.ftapiTranslate)({ query: text, target: "en" }, { baseUrl: cfg?.baseUrl ?? DEFAULTS.baseUrl });
+        const { detectedSourceLang } = await (0, ftapi_1.ftapiTranslate)({ query: text, target: "en" }, { baseUrl: cfg?.baseUrl ?? contants_1.DEFAULTS.baseUrl });
         if (!detectedSourceLang)
             throw new Error("FTAPI: could not detect language");
         return detectedSourceLang;
@@ -26,16 +22,16 @@ async function detectLanguage(text, cfg) {
         return detectedSourceLang.toLowerCase();
     }
     // LibreTranslate: primero /detect; si falla, fallback a /translate con source:"auto"
-    const baseUrl = cfg?.baseUrl ?? DEFAULTS.baseUrl ?? "http://localhost:5000";
+    const baseUrl = cfg?.baseUrl ?? contants_1.DEFAULTS.baseUrl ?? "http://localhost:5000";
     try {
         const det = await (0, libretranslate_1.libreTranslateDetect)(text, {
             baseUrl,
-            apiKey: cfg?.apiKey ?? DEFAULTS.apiKey,
+            apiKey: cfg?.apiKey ?? contants_1.DEFAULTS.apiKey,
         });
         return det.language;
     }
     catch {
-        const t = await (0, libretranslate_1.libreTranslateTranslate)({ query: text, source: "auto", target: "en" }, { baseUrl, apiKey: cfg?.apiKey ?? DEFAULTS.apiKey });
+        const t = await (0, libretranslate_1.libreTranslateTranslate)({ query: text, source: "auto", target: "en" }, { baseUrl, apiKey: cfg?.apiKey ?? contants_1.DEFAULTS.apiKey });
         const lang = Array.isArray(t.detectedLanguage)
             ? t.detectedLanguage[0]?.language
             : t.detectedLanguage?.language;

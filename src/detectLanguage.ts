@@ -1,4 +1,5 @@
 // detectLanguage.ts
+import { DEFAULTS } from "./contants";
 import { deeplTranslate } from "./providers/deepl";
 import { ftapiTranslate } from "./providers/ftapi";
 import {
@@ -6,12 +7,6 @@ import {
     libreTranslateTranslate,
 } from "./providers/libretranslate";
 import type { ClientConfig } from "./types";
-
-const DEFAULTS = {
-    provider: "ftapi",
-    baseUrl: "https://ftapi.pythonanywhere.com",
-    apiKey: process.env.LT_API_KEY,
-};
 
 export async function detectLanguage(
     text: string,

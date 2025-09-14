@@ -4,12 +4,7 @@ import { libreTranslateTranslate } from "./providers/libretranslate";
 import { deeplTranslate } from "./providers/deepl";
 import type { TranslateOptions } from "./types";
 import "dotenv/config";
-
-const DEFAULTS = {
-    provider: "deepl" as const,
-    apiKey: process.env.DEEPL_API_KEY,
-    baseUrl: "",
-};
+import { DEFAULTS } from "./contants";
 
 export async function translate(
     opts: TranslateOptions | string
